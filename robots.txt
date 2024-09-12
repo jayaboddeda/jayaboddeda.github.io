@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /test/
+Sitemap: https://jayaboddeda.github.io/sitemap.xml
