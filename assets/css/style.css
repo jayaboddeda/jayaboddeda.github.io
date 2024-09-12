@@ -896,7 +896,7 @@ html {
 }
 
 .header-inner {
-    padding: 30px 0px;
+    padding: 15px 0px;
     -webkit-transition: all 500ms ease;
     transition: all 500ms ease;
 }
@@ -924,7 +924,7 @@ html {
 }
 
 .main-header .logo img {
-    width: 120px;
+    width: 180px;
 }
 
 .main-header .nice-select .current {
@@ -1278,6 +1278,12 @@ html {
 
 .about-image-part img {
     width: 300px;
+}
+
+.about-image-part-home img {
+    width: 300px;
+    height: 300px;
+    object-fit: cover;
 }
 
 .about-image-part h2 {
@@ -3006,4 +3012,9 @@ ul.blog_pagination li a:hover {
     border-radius: 14px;
     padding: 25px;
     border: 1px solid var(--border-color);
+}
+
+.company-list img{
+    width: 150px;
+    object-fit: contain;
 }
