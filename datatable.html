@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DataTable with Buttons</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Bootstrap Icons (for the triple-dot, pencil icon) -->
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css"
+  />
+
+  <style>
+    /* 
+      Custom styling to closely match the provided screenshot design 
+      and ensure responsiveness. 
+    */
+    body {
+      background-color: #f8f9fa;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+    }
+
+    .table-container {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      padding: 1rem;
+    }
+
+    h4 {
+      margin-bottom: 1rem;
+    }
+
+    /* Override Bootstrap .btn-primary to match the purple color in the screenshot */
+    .btn-primary{
+      background-color: #8757ec  !important;
+      border-color: #8757ec  !important;
+    }
+    .btn-primary:hover,
+    .btn-primary:focus {
+        background-color: #6d47c0  !important;
+        border-color: #6d47c0  !important;
+    }
+
+    /* Use the same purple color for the Export dropdown button (if separate from .btn-primary) */
+    .btn-export {
+      background-color: #ece3ff;
+      border-color: #ece3ff;
+      color: #8b54fd;
+    }
+    .btn-export:hover,
+    .btn-export:focus {
+      background-color: #bda7e9;
+      border-color: #bda7e9;
+      color: #8b54fd;
+
+    }
+
+    /* Pagination: active page in purple */
+    .page-item.active .page-link {
+      background-color: #8757ec  !important;
+      border-color: #8757ec  !important;
+    }
+
+/* Pagination Custom Styling */
+.pagination-custom .page-item {
+  margin: 0 5px;
+}
+
+.pagination-custom .page-link {
+  border: none;
+  color: #6c757d;
+  font-weight: 500;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f8f9fa;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.pagination-custom .page-item.active .page-link {
+  background-color: #8757ec;
+  color: #fff;
+}
+
+.pagination-custom .page-link:hover {
+  background-color: #8757ec;
+  color: #fff;
+}
+
+.pagination-custom .prev-next {
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  background-color: #e9e9e9;
+  color: #6c757d;
+  text-decoration: none;
+}
+
+.pagination-custom .prev-next:hover {
+  background-color: #8757ec;
+  color: #fff;
+}
+
+
+    .custom-table thead th {
+      background-color: #f6f7fb;
+      font-weight: 600;
+      padding: 16px;
+      border-bottom: 2px solid #dee2e6;
+      
+    }
+    .custom-table tbody td {
+
+      padding: 10px 16px;
+  vertical-align: middle;
+    }
+
+    /* Status badges with color-coded backgrounds */
+    .badge-professional {
+      background-color: #d4f8e8;
+      color: #1f9e63;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+    .badge-resigned {
+      background-color: #fff5d2;
+      color: #bf9f00;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+    .badge-current {
+      background-color: #e8e2f7;
+      color: #5b3fa3;
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.8rem;
+    }
+
+    /* Minimal styling for action icons */
+    .btn-icon {
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 4px;
+    }
+    .btn-icon:hover {
+      background-color: #f2f2f2;
+    }
+
+    /* “Avatar” placeholders for name initials */
+    .avatar-text {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      margin-right: 8px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    /* Smaller text for role below the name */
+    .role-text {
+      color: #6c757d;
+      font-size: 0.8rem;
+    }
+
+    /* Responsive tweaks for smaller screens */
+    @media (max-width: 576px) {
+      .d-flex.flex-wrap.align-items-center.justify-content-between.mb-3 {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #searchInput {
+        margin-top: 0.5rem;
+      }
+      nav .pagination {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container my-4">
+  
+  <!-- Top row: "Show entries", "Export" dropdown, and "Add New Record" -->
+  <div class="d-flex flex-wrap align-items-center justify-content-between mb-3">
+  <h5 class="mb-0 fw-semibold">DataTable with Buttons</h5>
+    
+
+    <div class="d-flex">
+      <div class="dropdown me-2">
+        <button class="btn  btn-export fw-semibold" type="button" data-bs-toggle="dropdown">
+            <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="18" height="18" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" fill-rule="evenodd" class=""><g><path d="M11 2H6a4 4 0 0 0-4 4v12a4 4 0 0 0 4 4h12a4 4 0 0 0 4-4v-5a1 1 0 0 0-2 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5a1 1 0 0 0 0-2zm7.586 2H15a1 1 0 0 1 0-2h6a1 1 0 0 1 1 1v6a1 1 0 0 1-2 0V5.414l-7.293 7.293a1 1 0 0 1-1.414-1.414z" fill="#8b54fd" opacity="1" data-original="#000000"/></g></svg>
+        <span class="px-1">Export</span>  
+          <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="18" height="18" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path fill="#8b54fd" fill-rule="evenodd" d="M5.293 8.293a1 1 0 0 0 0 1.414l6 6a1 1 0 0 0 1.414 0l6-6a1 1 0 0 0-1.414-1.414L12 13.586 6.707 8.293a1 1 0 0 0-1.414 0z" clip-rule="evenodd" opacity="1" data-original="#000000" class=""/></g></svg>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" href="#">Excel</a></li>
+          <li><a class="dropdown-item" href="#">CSV</a></li>
+          <li><a class="dropdown-item" href="#">PDF</a></li>
+        </ul>
+      </div>
+      <button class="btn btn-primary d-flex align-items-center " id="btnAddNewRecord">
+        <svg  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="14" height="14" x="0" y="0" viewBox="0 0 512 512" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g transform="matrix(0.9999999999999996,0,0,0.9999999999999996,1.7053025658242404e-13,1.7053025658242404e-13)"><g data-name="03 Login"><path d="M256 512a25 25 0 0 1-25-25V25a25 25 0 0 1 50 0v462a25 25 0 0 1-25 25z" fill="#ffffff" opacity="1" data-original="#000000" class=""/><path d="M487 281H25a25 25 0 0 1 0-50h462a25 25 0 0 1 0 50z" fill="#ffffff" opacity="1" data-original="#000000" class=""/></g></g></svg>
+       <span class="ps-1 fw-semibold"> Add New Record</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex align-items-center">
+        <label for="showEntries" class="me-2 mb-0">Show</label>
+        <select id="showEntries" class="form-select form-select-sm" style="width: 75px;">
+          <option value="5">5</option>
+          <option value="7" selected>7</option>
+          <option value="10">10</option>
+          <option value="15">15</option>
+        </select>
+        <span class="ms-2">entries</span>
+      </div>
+    <!-- Search box -->
+    <div class="d-flex justify-content-end align-items-center mb-2">
+        <p class="mb-0 pe-2">Search: </p>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control form-control-sm"
+        style="max-width: 200px;"
+      />
+    </div>
+    </div>
+
+    <!-- The Table -->
+    <table class="table custom-table mb-0" id="employeeTable">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input type="checkbox" id="checkAll" />
+          </th>
+          <th>NAME</th>
+          <th>EMAIL</th>
+          <th>DATE</th>
+          <th>SALARY</th>
+          <th>STATUS</th>
+          <th style="width: 70px;">ACTIONS</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filled by JavaScript -->
+      </tbody>
+    </table>
+
+    <!-- Pagination info & controls -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between mt-3">
+      <div id="tableInfo" class="text-secondary" style="font-size: 0.9rem;">
+        <!-- "Showing 1 to 7 of 100 entries" goes here -->
+      </div>
+<!-- Updated Pagination Section -->
+<nav>
+    <ul class="pagination pagination-custom justify-content-center mb-0">
+      <li class="page-item">
+        <a class=" prev-next" id="prevPage">Previous</a>
+      </li>
+      <!-- Page numbers injected here -->
+      <li class="page-item">
+        <a class=" prev-next" id="nextPage">Next</a>
+      </li>
+    </ul>
+  </nav>
+  
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap 5 JS (for the dropdown, etc.) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // ====================== SAMPLE DATA ======================
+  const employees = [
+    {
+      avatarText: 'GG',
+      name: 'Glyn Giacoppo',
+      role: 'Software Test Engineer',
+      email: 'ggiacoppo2r@apache.org',
+      date: '04/15/2021',
+      salary: 24973.48,
+      status: 'Professional'
+    },
+    {
+      avatarText: 'EC',
+      name: 'Evangelina Carnock',
+      role: 'Cost Accountant',
+      email: 'ecarnock2q@washington.edu',
+      date: '01/26/2021',
+      salary: 23704.82,
+      status: 'Resigned'
+    },
+    {
+      avatarText: 'OG',
+      name: 'Olivette Gudgin',
+      role: 'Paralegal',
+      email: 'ogudgin2p@gizmodo.com',
+      date: '04/09/2021',
+      salary: 15211.60,
+      status: 'Professional'
+    },
+    {
+      avatarText: 'RP',
+      name: 'Reina Peckett',
+      role: 'Quality Control Specialist',
+      email: 'rpeckett2o@timesonline.co.uk',
+      date: '05/20/2021',
+      salary: 16619.40,
+      status: 'Resigned'
+    },
+    {
+      avatarText: 'AB',
+      name: 'Alaric Beslier',
+      role: 'Tax Accountant',
+      email: 'abeslier2n@zimbio.com',
+      date: '04/16/2021',
+      salary: 19366.53,
+      status: 'Resigned'
+    },
+    {
+      avatarText: 'EE',
+      name: 'Edwina Ebsworth',
+      role: 'Human Resources Assistant',
+      email: 'ebsworth2m@sbwire.com',
+      date: '09/27/2021',
+      salary: 19586.23,
+      status: 'Current'
+    },
+    {
+      avatarText: 'RH',
+      name: 'Ronica Hasted',
+      role: 'Software Consultant',
+      email: 'rhasted2l@hexun.com',
+      date: '07/04/2021',
+      salary: 24866.66,
+      status: 'Resigned'
+    },
+    // More sample data to demonstrate pagination:
+    {
+      avatarText: 'MT',
+      name: 'Malachi Towton',
+      role: 'Operations Manager',
+      email: 'mtowton@example.com',
+      date: '02/21/2021',
+      salary: 23200.0,
+      status: 'Professional'
+    },
+    {
+      avatarText: 'AB',
+      name: 'Aerin Brough',
+      role: 'UI/UX Designer',
+      email: 'abrough@example.com',
+      date: '05/30/2021',
+      salary: 18800.0,
+      status: 'Professional'
+    },
+    {
+      avatarText: 'JS',
+      name: 'Jayden Smith',
+      role: 'Data Analyst',
+      email: 'jsmith@example.com',
+      date: '06/10/2021',
+      salary: 21000.0,
+      status: 'Current'
+    },
+    {
+      avatarText: 'KS',
+      name: 'Kinsley Squire',
+      role: 'Marketing Coordinator',
+      email: 'ksquire@example.com',
+      date: '04/22/2021',
+      salary: 19800.0,
+      status: 'Resigned'
+    },
+    {
+      avatarText: 'AH',
+      name: 'Alda Harrald',
+      role: 'Financial Advisor',
+      email: 'aharrald@example.com',
+      date: '09/11/2021',
+      salary: 28900.0,
+      status: 'Professional'
+    },
+    {
+      avatarText: 'KW',
+      name: 'Kyra Wright',
+      role: 'Project Manager',
+      email: 'kwright@example.com',
+      date: '10/02/2021',
+      salary: 26300.0,
+      status: 'Current'
+    },
+    {
+      avatarText: 'PR',
+      name: 'Percy Redwood',
+      role: 'Account Manager',
+      email: 'predwood@example.com',
+      date: '11/15/2021',
+      salary: 22000.0,
+      status: 'Professional'
+    },
+  ];
+
+  // ====================== GLOBALS ==========================
+  let currentPage = 1;
+  let rowsPerPage = parseInt(document.getElementById('showEntries').value);
+  let filteredData = [...employees];
+
+  const tableBody = document.querySelector('#employeeTable tbody');
+  const tableInfo = document.getElementById('tableInfo');
+  const prevPageBtn = document.getElementById('prevPage');
+  const nextPageBtn = document.getElementById('nextPage');
+  const paginationWrapper = document.querySelector('.pagination');
+
+  // ====================== RENDER FUNCTIONS =================
+  function renderTable() {
+    tableBody.innerHTML = '';
+
+    // Determine slice of data for current page
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const pageData = filteredData.slice(startIndex, endIndex);
+
+    // Populate rows
+    pageData.forEach(item => {
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td >
+          <input type="checkbox" class="rowCheckbox" />
+        </td>
+        <td class="d-flex align-items-center">
+          <span class="avatar-text" style="background-color: ${getColorForAvatar(item.avatarText)}">
+            ${item.avatarText}
+          </span>
+          <div>
+          <span>${item.name}</span><br />
+          <span class="role-text">${item.role}</span>
+          </div>
+        </td>
+        <td>${item.email}</td>
+        <td>${item.date}</td>
+        <td>$${item.salary.toFixed(2)}</td>
+        <td class="fw-semibold">${renderStatusBadge(item.status)}</td>
+        <td>
+          <div class="d-flex">
+            <button class="btn-icon" title="More options">
+              <i class="bi bi-three-dots-vertical"></i>
+            </button>
+            <button class="btn-icon" title="Edit">
+              <i class="bi bi-pencil-square"></i>
+            </button>
+          </div>
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+
+    updateTableInfo();
+    renderPaginationButtons();
+  }
+
+  function renderStatusBadge(status) {
+    switch (status.toLowerCase()) {
+      case 'professional':
+        return `<span class="badge-professional">Professional</span>`;
+      case 'resigned':
+        return `<span class="badge-resigned">Resigned</span>`;
+      case 'current':
+        return `<span class="badge-current">Current</span>`;
+      default:
+        return `<span class="badge bg-secondary">${status}</span>`;
+    }
+  }
+
+  // ====================== PAGINATION =======================
+  function renderPaginationButtons() {
+  const pageLinks = paginationWrapper.querySelectorAll('.page-number');
+  pageLinks.forEach((link) => link.remove());
+
+  const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+  const visiblePages = 5; // Max number of visible page buttons
+  let startPage = Math.max(1, currentPage - Math.floor(visiblePages / 2));
+  let endPage = Math.min(totalPages, startPage + visiblePages - 1);
+
+  if (endPage - startPage < visiblePages - 1) {
+    startPage = Math.max(1, endPage - visiblePages + 1);
+  }
+
+  // Create page buttons
+  for (let i = startPage; i <= endPage; i++) {
+    const li = document.createElement('li');
+    li.classList.add('page-item', 'page-number');
+    if (i === currentPage) {
+      li.classList.add('active');
+    }
+    const a = document.createElement('a');
+    a.classList.add('page-link');
+    a.textContent = i;
+    a.addEventListener('click', () => {
+      currentPage = i;
+      renderTable();
+    });
+    li.appendChild(a);
+    nextPageBtn.parentNode.before(li);
+  }
+
+  // Add ellipses (...) if there are more pages
+  if (startPage > 1) {
+    const li = document.createElement('li');
+    li.classList.add('page-item');
+    li.innerHTML = '<a class="page-link">...</a>';
+    prevPageBtn.parentNode.after(li);
+  }
+
+  if (endPage < totalPages) {
+    const li = document.createElement('li');
+    li.classList.add('page-item');
+    li.innerHTML = '<a class="page-link">...</a>';
+    nextPageBtn.parentNode.before(li);
+  }
+
+  // Enable/disable "Previous" and "Next"
+  prevPageBtn.parentElement.classList.toggle('disabled', currentPage === 1);
+  nextPageBtn.parentElement.classList.toggle(
+    'disabled',
+    currentPage === totalPages
+  );
+}
+
+  function updateTableInfo() {
+    const start = (currentPage - 1) * rowsPerPage + 1;
+    const end = Math.min(start + rowsPerPage - 1, filteredData.length);
+    tableInfo.textContent = `Showing ${start} to ${end} of ${filteredData.length} entries`;
+  }
+
+  prevPageBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderTable();
+    }
+  });
+  nextPageBtn.addEventListener('click', () => {
+    const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderTable();
+    }
+  });
+
+  // ====================== SEARCH ===========================
+  const searchInput = document.getElementById('searchInput');
+  searchInput.addEventListener('input', () => {
+    const keyword = searchInput.value.toLowerCase().trim();
+    filteredData = employees.filter(emp => {
+      return (
+        emp.name.toLowerCase().includes(keyword) ||
+        emp.email.toLowerCase().includes(keyword) ||
+        emp.role.toLowerCase().includes(keyword) ||
+        emp.status.toLowerCase().includes(keyword)
+      );
+    });
+    currentPage = 1;
+    renderTable();
+  });
+
+  // ====================== SHOW ENTRIES =====================
+  const showEntriesSelect = document.getElementById('showEntries');
+  showEntriesSelect.addEventListener('change', () => {
+    rowsPerPage = parseInt(showEntriesSelect.value);
+    currentPage = 1;
+    renderTable();
+  });
+
+  // ====================== CHECK / UNCHECK ALL ==============
+  const checkAll = document.getElementById('checkAll');
+  checkAll.addEventListener('change', () => {
+    const rowCheckboxes = document.querySelectorAll('.rowCheckbox');
+    rowCheckboxes.forEach(cb => {
+      cb.checked = checkAll.checked;
+    });
+  });
+
+  // ====================== AVATAR COLOR ======================
+  function getColorForAvatar(text) {
+    // A simple function to return consistent color per initial
+    const colors = [
+      '#6f42c1',
+      '#6610f2',
+      '#e83e8c',
+      '#fd7e14',
+      '#20c997',
+      '#17a2b8',
+      '#007bff',
+      '#28a745',
+      '#8e44ad'
+    ];
+    let sum = 0;
+    for (let i = 0; i < text.length; i++) {
+      sum += text.charCodeAt(i);
+    }
+    return colors[sum % colors.length];
+  }
+
+  // ====================== INIT =============================
+  renderTable();
+</script>
+
+</body>
+</html>
