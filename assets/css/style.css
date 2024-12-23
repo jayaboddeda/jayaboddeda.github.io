@@ -1796,8 +1796,7 @@ ul.extra-skills li i {
     display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
-    -ms-flex-wrap: wrap;
-    flex-wrap: wrap;
+    overflow-x: scroll;
     margin-left: -20px;
     margin-right: -20px;
 }
@@ -1813,6 +1812,7 @@ ul.extra-skills li i {
     margin: 0 20px 20px;
     padding-bottom: 15px;
     color: rgb(119, 119, 125);
+    text-wrap: nowrap;
 }
 
 .filter-btns-one li:after {
@@ -3017,4 +3017,16 @@ ul.blog_pagination li a:hover {
 .company-list img{
     width: 150px;
     object-fit: contain;
+}
+
+
+@media (max-width: 576px) {
+
+    h3{
+        font-size: 20px;
+    }
+    .about-image-part-home img{
+        width: 250px;
+        height: 250px;
+    }
 }
