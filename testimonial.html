@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Share Your Testimonial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script> <!-- Confetti Library -->
+    <style>
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+
+        .input-focus:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .gradient-border {
+            background: linear-gradient(white, white) padding-box,
+                        linear-gradient(45deg, #6366F1, #A855F7) border-box;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .rating-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .rating-btn {
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .rating-btn.selected {
+            background: linear-gradient(45deg, #6366F1, #A855F7);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .image-preview-container {
+            max-width: 200px;
+            max-height: 200px;
+            overflow: hidden;
+            margin: 0 auto;
+            border-radius: 8px;
+            display: none;
+        }
+
+        #confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div class="relative bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-2xl w-full">
+        <div class="text-center mb-8">
+            <div class="text-6xl mb-4 floating">✨</div>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+                Share Your Testimonial
+            </h1>
+            <p class="text-gray-600">We value your feedback</p>
+        </div>
+
+        <form id="testimonialForm" class="space-y-6">
+            <div class="space-y-4">
+                <div class="space-y-2">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input required type="text" id="name" name="name"
+                            class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:outline-none input-focus bg-white/50"
+                            placeholder="Your Name e.g. John Doe">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">👋</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="company" class="block text-sm font-medium text-gray-700">Company Name <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input required type="text" id="company" name="company"
+                            class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:outline-none input-focus bg-white/50"
+                            placeholder="Your Company e.g. Tech Innovators Inc.">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">🏢</span>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label for="role" class="block text-sm font-medium text-gray-700">Position <span class="text-red-500">*</span></label>
+                    <div class="relative">
+                        <input required type="text" id="role" name="role"
+                            class="w-full px-6 py-4 rounded-2xl border border-gray-200 focus:outline-none input-focus bg-white/50"
+                            placeholder="Your Role e.g. Founder, Co-Founder">
+                        <span class="absolute right-4 top-1/2 transform -translate-y-1/2 text-2xl">💼</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rating Section -->
+            <div class="space-y-4">
+                <label class="block text-sm font-medium text-gray-700">
+                    How would you rate your experience? <span class="text-red-500">*</span>
+                </label>
+                <div class="rating-container">
+                    <button type="button" class="rating-btn px-4 py-2 rounded-lg border border-gray-200 hover:border-indigo-500 focus:outline-none" data-value="1">😤 Poor</button>
+                    <button type="button" class="rating-btn px-4 py-2 rounded-lg border border-gray-200 hover:border-indigo-500 focus:outline-none" data-value="2">😕 Fair</button>
+                    <button type="button" class="rating-btn px-4 py-2 rounded-lg border border-gray-200 hover:border-indigo-500 focus:outline-none" data-value="3">😊 Good</button>
+                    <button type="button" class="rating-btn px-4 py-2 rounded-lg border border-gray-200 hover:border-indigo-500 focus:outline-none" data-value="4">🤩 Excellent</button>
+                    <button type="button" class="rating-btn px-4 py-2 rounded-lg border border-gray-200 hover:border-indigo-500 focus:outline-none" data-value="5">🚀 Outstanding</button>
+                </div>
+                <input type="hidden" id="rating" name="rating" required>
+            </div>
+
+            <div class="space-y-2">
+                <label for="testimonial" class="block text-sm font-medium text-gray-700">
+                    Your Testimonial <span class="text-red-500">*</span>
+                </label>
+                <textarea required minlength="50" id="testimonial" name="testimonial" rows="4"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none input-focus bg-white resize-none"
+                    placeholder="Please share your experience with us... ✨"></textarea>
+                <div id="charCount" class="text-right text-sm text-gray-500">
+                    0/50 characters minimum
+                </div>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="relative">
+                <div id="imagePreviewContainer" class="image-preview-container">
+                    <img id="imagePreview" class="mx-auto mb-4 rounded-2xl shadow-lg max-w-[200px] max-h-[200px] object-cover" alt="Profile preview">
+                </div>
+                <div class="flex justify-center gap-4">
+                    <label class="px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-xl text-white font-medium cursor-pointer hover:opacity-90 transition-all transform hover:scale-105 active:scale-95">
+                        Add Your Photo 📸
+                        <input type="file" class="hidden" id="imageUpload" accept="image/*">
+                    </label>
+                    <button type="button" id="removeImage" class="hidden px-6 py-3 bg-red-50 text-red-500 rounded-xl font-medium hover:bg-red-100 transition-all transform hover:scale-105 active:scale-95">
+                        Remove
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+            class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-medium transition-all transform hover:scale-[1.02] active:scale-[0.98] hover:shadow-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Submit Testimonial ✨
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Testimonial Char Counter
+        const testimonial = document.getElementById('testimonial');
+        const charCount = document.getElementById('charCount');
+        const imageUpload = document.getElementById('imageUpload');
+        const imagePreview = document.getElementById('imagePreview');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const removeButton = document.getElementById('removeImage');
+        const ratingBtns = document.querySelectorAll('.rating-btn');
+        const ratingInput = document.getElementById('rating');
+
+        testimonial.addEventListener('input', function () {
+            const length = this.value.length;
+            charCount.textContent = `${length}/50 characters minimum`;
+            charCount.style.color = length >= 50 ? '#6366F1' : '#6B7280';
+        });
+
+        // Rating Button Interaction
+        ratingBtns.forEach(btn => {
+            btn.addEventListener('click', function () {
+                ratingBtns.forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+                ratingInput.value = this.dataset.value;
+            });
+        });
+
+        // Image Upload Preview
+        imageUpload.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Please select an image under 5MB');
+                    this.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block';
+                    removeButton.classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Remove Image Button
+        removeButton.addEventListener('click', function () {
+            imageUpload.value = '';
+            imagePreview.src = '';
+            imagePreviewContainer.style.display = 'none';
+            this.classList.add('hidden');
+        });
+
+        // Form Submission Success
+        document.getElementById('testimonialForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            if (!ratingInput.value) {
+                alert('Please select a rating');
+                return;
+            }
+
+            this.innerHTML = `
+                <div class="text-center py-8">
+                    <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+                        Thank You for Your Feedback
+                    </h2>
+                    <p class="text-gray-600">Your testimonial has been submitted successfully.</p>
+                    <div id="confetti"></div>
+                </div>
+            `;
+            
+            // Trigger Confetti Animation
+            confetti({
+                particleCount: 150,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#6366F1', '#A855F7', '#F472B6']
+            });
+
+            // Explicitly reset form values
+            setTimeout(() => {
+                // Reset the form
+                document.getElementById('testimonialForm').reset();
+
+                // Reset custom elements: Image preview and Rating buttons
+                imagePreviewContainer.style.display = 'none';
+                imagePreview.src = '';
+                imageUpload.value = ''; // Clear file input
+                removeButton.classList.add('hidden');
+                ratingBtns.forEach(b => b.classList.remove('selected'));
+                ratingInput.value = ''; // Reset hidden rating input
+
+                // Reset testimonial character count
+                charCount.textContent = `0/50 characters minimum`;
+                charCount.style.color = '#6B7280';
+            }, 3000); // Wait 3 seconds before resetting
+        });
+    </script>
+</body>
+
+</html>
