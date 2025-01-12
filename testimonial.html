@@ -77,9 +77,40 @@
             }
         }
     </style>
+    <style>
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+    
+        .animate-bounce {
+            animation: bounce 1.2s infinite;
+        }
+    
+        .delay-150 {
+            animation-delay: 0.15s;
+        }
+    
+        .delay-300 {
+            animation-delay: 0.3s;
+        }
+    </style>
+    
 </head>
 
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen flex items-center justify-center p-4 sm:p-6">
+    <div id="loader" class="hidden fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+        <div class="flex items-center space-x-2">
+            <div class="w-4 h-4 bg-indigo-500 rounded-full animate-bounce"></div>
+            <div class="w-4 h-4 bg-purple-500 rounded-full animate-bounce delay-150"></div>
+            <div class="w-4 h-4 bg-pink-500 rounded-full animate-bounce delay-300"></div>
+        </div>
+    </div>
+    
     <div class="relative bg-white rounded-2xl shadow-xl p-6 sm:p-8 max-w-2xl w-full">
         <div class="text-center mb-8">
             <div class="text-6xl mb-4 floating">✨</div>
@@ -228,24 +259,104 @@
         });
 
         // Form Submission Success
-        document.getElementById('testimonialForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            if (!ratingInput.value) {
-                alert('Please select a rating');
-                return;
-            }
+        // document.getElementById('testimonialForm').addEventListener('submit', function (e) {
+        //     e.preventDefault();
+        //     if (!ratingInput.value) {
+        //         alert('Please select a rating');
+        //         return;
+        //     }
+
+        //     this.innerHTML = `
+        //         <div class="text-center py-8">
+        //             <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
+        //                 Thank You for Your Feedback
+        //             </h2>
+        //             <p class="text-gray-600">Your testimonial has been submitted successfully.</p>
+        //             <div id="confetti"></div>
+        //         </div>
+        //     `;
+            
+        //     // Trigger Confetti Animation
+        //     confetti({
+        //         particleCount: 150,
+        //         spread: 70,
+        //         origin: { y: 0.6 },
+        //         colors: ['#6366F1', '#A855F7', '#F472B6']
+        //     });
+
+        //     // Explicitly reset form values
+        //     setTimeout(() => {
+        //         // Reset the form
+        //         document.getElementById('testimonialForm').reset();
+
+        //         // Reset custom elements: Image preview and Rating buttons
+        //         imagePreviewContainer.style.display = 'none';
+        //         imagePreview.src = '';
+        //         imageUpload.value = ''; // Clear file input
+        //         removeButton.classList.add('hidden');
+        //         ratingBtns.forEach(b => b.classList.remove('selected'));
+        //         ratingInput.value = ''; // Reset hidden rating input
+
+        //         // Reset testimonial character count
+        //         charCount.textContent = `0/50 characters minimum`;
+        //         charCount.style.color = '#6B7280';
+        //     }, 3000); // Wait 3 seconds before resetting
+        // });
+    </script>
+
+<script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+
+<script>
+emailjs.init(
+  "gbsQpvGN-umolUkH_"
+);
+    // Form Submission
+    document.getElementById('testimonialForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (!ratingInput.value) {
+        alert('Please select a rating');
+        return;
+    }
+
+    // Show loader
+    const loader = document.getElementById('loader');
+    loader.classList.remove('hidden');
+
+    // Collect form data
+    const formData = {
+        name: document.getElementById('name').value,
+        company: document.getElementById('company').value,
+        role: document.getElementById('role').value,
+        rating: ratingInput.value,
+        testimonial: document.getElementById('testimonial').value
+    };
+
+    const emailParams = {
+        name: formData.name,
+        company: formData.company,
+        role: formData.role,
+        rating: formData.rating,
+        testimonial: formData.testimonial
+    };
+
+    // Send email using EmailJS
+    emailjs.send('service_l4h4log', 'template_p9lbdnl', emailParams)
+        .then(() => {
+            loader.classList.add('hidden'); // Hide loader
 
             this.innerHTML = `
                 <div class="text-center py-8">
                     <h2 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-4">
                         Thank You for Your Feedback
                     </h2>
-                    <p class="text-gray-600">Your testimonial has been submitted successfully.</p>
+                    <p class="text-gray-600">Your testimonial has been submitted and emailed successfully.</p>
                     <div id="confetti"></div>
                 </div>
             `;
-            
-            // Trigger Confetti Animation
+
             confetti({
                 particleCount: 150,
                 spread: 70,
@@ -253,25 +364,26 @@
                 colors: ['#6366F1', '#A855F7', '#F472B6']
             });
 
-            // Explicitly reset form values
             setTimeout(() => {
-                // Reset the form
-                document.getElementById('testimonialForm').reset();
-
-                // Reset custom elements: Image preview and Rating buttons
                 imagePreviewContainer.style.display = 'none';
                 imagePreview.src = '';
-                imageUpload.value = ''; // Clear file input
+                imageUpload.value = '';
                 removeButton.classList.add('hidden');
                 ratingBtns.forEach(b => b.classList.remove('selected'));
-                ratingInput.value = ''; // Reset hidden rating input
-
-                // Reset testimonial character count
+                ratingInput.value = '';
                 charCount.textContent = `0/50 characters minimum`;
                 charCount.style.color = '#6B7280';
-            }, 3000); // Wait 3 seconds before resetting
+            }, 3000);
+        })
+        .catch((error) => {
+            loader.classList.add('hidden'); // Hide loader
+            alert('Failed to send email: ' + error.text);
         });
-    </script>
+});
+
+</script>
+
+    
 </body>
 
 </html>
